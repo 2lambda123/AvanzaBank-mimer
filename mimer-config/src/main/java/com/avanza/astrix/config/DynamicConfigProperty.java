@@ -28,41 +28,48 @@ final class DynamicConfigProperty<T> implements DynamicPropertyListener<String> 
 	
 	private final Logger logger = LoggerFactory.getLogger(DynamicConfigProperty.class);
 	private final DynamicPropertyListener<DynamicConfigProperty<T>> propertyChangeListener;
-	private final PropertyParser<T> parser;
-	private volatile T value = null;
+	private PropertyParser<T> property;
+	private T value;
 
 	private DynamicConfigProperty(DynamicPropertyListener<DynamicConfigProperty<T>> propertyChangeListener, PropertyParser<T> propertyParser) {
 		this.propertyChangeListener = propertyChangeListener;
-		this.parser = propertyParser;
+		this.property = propertyParser;
 	}
 	
-	public T get() {
-		return this.value;
+	public synchronized T get() {
+		synchronized (this) {
+	return this.value;
+}
 	}
 	
 	boolean isSet() {
 		return this.value != null;
 	}
 	
-	public void set(String value) {
+	public synchronized void set(String value) {
 		try {
 			if (value != null) {
-				this.value = parser.parse(value);
+				if (value == null) {
+	this.value = null;
+} else {
+	validateParsedValue(value);
+}
 			} else {
 				this.value = null;
 			}
-			propertyChangeListener.propertyChanged(this);
+			propertyChangeListener.propertyChanged(this.value);
 		} catch (Exception e) {
 			logger.error("Failed to parse: {}", value, e);
 		}
 	}
 	
 	@Override
-	public void propertyChanged(String newValue) {
+	public synchronized void propertyChanged(String newValue) {
 		set(newValue);
 	}
 	
 	public static <T> DynamicConfigProperty<T> create(DynamicPropertyListener<DynamicConfigProperty<T>> propertyChangeListener, PropertyParser<T> propertyParser) {
+	return new DynamicConfigProperty<>(propertyChangeListener, propertyParser, propertyParser);
 		return new DynamicConfigProperty<>(propertyChangeListener, propertyParser);
 	}
 
