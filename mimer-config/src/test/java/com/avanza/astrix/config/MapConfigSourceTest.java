@@ -25,77 +25,84 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-
 import org.junit.jupiter.api.Test;
 
 class MapConfigSourceTest {
 
-	@Test
-	void shouldCreateFromMap() {
-		MapConfigSource source = MapConfigSource.of(new HashMap<String, Object>() {{
-			put("property1", "value1");
-			put("property2", "value2");
-		}});
+  @Test
+  void shouldCreateFromMap() {
+    MapConfigSource source = MapConfigSource.of(new HashMap<String, Object>() {
+      {
+        put("property1", "value1");
+        put("property2", "value2");
+      }
+    });
 
-		assertThat(source.get("property1"), equalTo("value1"));
-		assertThat(source.get("property2"), equalTo("value2"));
-	}
+    assertThat(source.get("property1"), equalTo("value1"));
+    assertThat(source.get("property2"), equalTo("value2"));
+  }
 
-	@Test
-	void shouldCreateFromSingleKeyValuePair() {
-		MapConfigSource source = MapConfigSource.of("property1", "value1");
+  @Test
+  void shouldCreateFromSingleKeyValuePair() {
+    MapConfigSource source = MapConfigSource.of("property1", "value1");
 
-		assertThat(source.get("property1"), equalTo("value1"));
-		assertThat(source.get("property2"), nullValue());
-	}
+    assertThat(source.get("property1"), equalTo("value1"));
+    assertThat(source.get("property2"), nullValue());
+  }
 
-	@Test
-	void shouldCreateFromTwoKeyValuePairs() {
-		MapConfigSource source = MapConfigSource.of("property1", "value1",
-													"property2", "value2");
+  @Test
+  void shouldCreateFromTwoKeyValuePairs() {
+    MapConfigSource source =
+        MapConfigSource.of("property1", "value1", "property2", "value2");
 
-		assertThat(source.get("property1"), equalTo("value1"));
-		assertThat(source.get("property2"), equalTo("value2"));
-	}
+    assertThat(source.get("property1"), equalTo("value1"));
+    assertThat(source.get("property2"), equalTo("value2"));
+  }
 
-	@Test
-	void shouldCreateFromThreeKeyValuePairs() {
-		MapConfigSource source = MapConfigSource.of("property1", "value1",
-													"property2", "value2",
-													"property3", "value3");
+  @Test
+  void shouldCreateFromThreeKeyValuePairs() {
+    MapConfigSource source = MapConfigSource.of(
+        "property1", "value1", "property2", "value2", "property3", "value3");
 
-		assertThat(source.get("property1"), equalTo("value1"));
-		assertThat(source.get("property2"), equalTo("value2"));
-		assertThat(source.get("property3"), equalTo("value3"));
-	}
+    assertThat(source.get("property1"), equalTo("value1"));
+    assertThat(source.get("property2"), equalTo("value2"));
+    assertThat(source.get("property3"), equalTo("value3"));
+  }
 
-	@Test
-	void shouldGetNewDefaultValuesEachTime() {
-		// Arrange
-		final DynamicConfig dynamicConfig = DynamicConfig.create(new MapConfigSource());
+  @Test
+  void shouldGetNewDefaultValuesEachTime() {
+    // Arrange
+    final DynamicConfig dynamicConfig =
+        DynamicConfig.create(new MapConfigSource());
 
-		// Act
-		final String v1 = dynamicConfig.getStringProperty("key", "first-default").get();
-		final String v2 = dynamicConfig.getStringProperty("key", "second-default").get();
+    // Act
+    final String v1 =
+        dynamicConfig.getStringProperty("key", "first-default").get();
+    final String v2 =
+        dynamicConfig.getStringProperty("key", "second-default").get();
 
-		// Assert
-		assertThat(v1, equalTo("first-default"));
-		assertThat(v2, equalTo("second-default"));
-	}
+    // Assert
+    assertThat(v1, equalTo("first-default"));
+    assertThat(v2, equalTo("second-default"));
+  }
 
-	@Test
-	void shouldGetNewDefaultValuesEachTimeForIntListProperties() {
-		// Arrange
-		final DynamicConfig dynamicConfig = DynamicConfig.create(new MapConfigSource());
+  @Test
+  void shouldGetNewDefaultValuesEachTimeForIntListProperties() {
+    // Arrange
+    final DynamicConfig dynamicConfig =
+        DynamicConfig.create(new MapConfigSource());
 
-		// Act
-		final DynamicListProperty<Integer> emptyList1 = dynamicConfig.getIntListProperty("key", Collections.emptyList());
-		final DynamicListProperty<Integer> emptyList2 = dynamicConfig.getIntListProperty("key", new ArrayList<>());
-		final DynamicListProperty<Integer> list = dynamicConfig.getIntListProperty("key", Arrays.asList(1, 2));
+    // Act
+    final DynamicListProperty<Integer> emptyList1 =
+        dynamicConfig.getIntListProperty("key", Collections.emptyList());
+    final DynamicListProperty<Integer> emptyList2 =
+        dynamicConfig.getIntListProperty("key", new ArrayList<>());
+    final DynamicListProperty<Integer> list =
+        dynamicConfig.getIntListProperty("key", Arrays.asList(1, 2));
 
-		// Assert
-		assertThat(emptyList1, sameInstance(emptyList2));
-		assertThat(emptyList1.get(), equalTo(Collections.emptyList()));
-		assertThat(list.get(), containsInAnyOrder(1, 2));
-	}
+    // Assert
+    assertThat(emptyList1, sameInstance(emptyList2));
+    assertThat(emptyList1.get(), equalTo(Collections.emptyList()));
+    assertThat(list.get(), containsInAnyOrder(1, 2));
+  }
 }
